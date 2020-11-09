@@ -313,6 +313,7 @@
 
             // Food Intersects
             if (body[0].intersects(food)) {
+                uploadScore()
                  score += 1;
                 body.push(new Rectangle(0, 0, 10, 10));
                 food.x = random(canvas.width / 10 - 1) * 10;
@@ -321,6 +322,7 @@
             }
             // Food 2 Intersects
             if (body[0].intersects(food2)) {
+                uploadScore()
                 score += 1;
                 body.push(new Rectangle(10, 10, 10, 10));
                  food2.x = -9;
@@ -393,20 +395,22 @@
     };
     window.addEventListener('load', init, false);
 
-// Make a POST request
-fetch(`www.jsonplaceholder.com?score=${score}`, {
-    method: 'post',
-    // params: `?score=${score}`
-}).then(function (response) {
-	if (response.ok) {
-		return response.json();
-	}
-	return Promise.reject(response);
-}).then(function (data) {
-	console.log('Score sent successfully' + data);
-}).catch(function (error) {
-	console.warn('Error trying to send the score', error);
-});
+// FETCH SCORE API
+
+function  uploadScore(score){
+    fetch(` www.jsonplaceholder.com?score=${score}`, {
+            method: 'POST'
+    })
+    .then(function(response){
+         return response.json()
+    })
+   
+    .then(function(data){
+console.log('Score sent successfully' + data);
+    })
+    .catch(console.log('Error trying to send the score'))
+}
+
 
 
 }(window))
