@@ -1,4 +1,3 @@
-
 (function (window, undefined) {
     'use strict';
     var KEY_ENTER = 13,
@@ -15,9 +14,12 @@
     scenes = [],
     mainScene = null,
     gameScene = null,
+    highscoresScene = null,
     body = [],
     food = null,
     //var wall = [],
+    highscores = [],
+    posHighscore = 10,
     dir = 0,
     score = 0,
     iBody = new Image(),
@@ -36,7 +38,6 @@
     if (evt.which >= 37 && evt.which <= 40) {
     evt.preventDefault();
     }
-    
     lastPress = evt.which;
     }, false);
     function Rectangle(x, y, width, height) {
@@ -69,6 +70,7 @@
     window.console.warn('Missing parameters on function drawImage');
     } else {
     if (img.width) {
+  
     ctx.drawImage(img, this.x, this.y);
     } else {
     ctx.strokeRect(this.x, this.y, this.width, this.height);
@@ -93,12 +95,22 @@
     function random(max) {
     return ~~(Math.random() * max);
     }
+    function addHighscore(score) {
+    posHighscore = 0;
+    while (highscores[posHighscore] > score && posHighscore < highscores.length) {
+    posHighscore += 1;
+    }
+    highscores.splice(posHighscore, 0, score);
+    if (highscores.length > 10) {
+    highscores.length = 10;
+    }
+    localStorage.highscores = highscores.join(',');
+    }
     function repaint() {
     window.requestAnimationFrame(repaint);
     if (scenes.length) {
     scenes[currentScene].paint(ctx);
     }
-
     }
     function run() {
     setTimeout(run, 50);
@@ -120,8 +132,13 @@
     // Create walls
     //wall.push(new Rectangle(50, 50, 10, 10));
     //wall.push(new Rectangle(50, 100, 10, 10));
+ 
     //wall.push(new Rectangle(100, 50, 10, 10));
     //wall.push(new Rectangle(100, 100, 10, 10));
+    // Load saved highscores
+    if (localStorage.highscores) {
+    highscores = localStorage.highscores.split(',');
+    }
     // Start game
     run();
     repaint();
@@ -141,7 +158,7 @@
     mainScene.act = function () {
     // Load next scene
     if (lastPress === KEY_ENTER) {
-    loadScene(gameScene);
+    loadScene(highscoresScene);
     lastPress = null;
     }
     };
@@ -158,7 +175,6 @@
     food.y = random(canvas.height / 10 - 1) * 10;
     gameover = false;
     };
-
     gameScene.paint = function (ctx) {
     var i = 0,
     l = 0;
@@ -176,6 +192,7 @@
     // wall[i].fill(ctx);
     //}
     // Draw food
+  
     ctx.strokeStyle = '#f00';
     food.drawImage(ctx, iFood);
     // Draw score
@@ -200,7 +217,7 @@
     if (!pause) {
     // GameOver Reset
     if (gameover) {
-    loadScene(mainScene);
+    loadScene(highscoresScene);
     }
     // Move Body
     for (i = body.length - 1; i > 0; i -= 1) {
@@ -220,7 +237,6 @@
     if (lastPress === KEY_LEFT && dir !== 1) {
     dir = 3;
     }
-   
     // Move Head
     if (dir === 0) {
     body[0].y -= 10;
@@ -240,6 +256,7 @@
     }
     if (body[0].y > canvas.height - body[0].height) {
     body[0].y = 0;
+
     }
     if (body[0].x < 0) {
     body[0].x = canvas.width - body[0].width;
@@ -273,12 +290,43 @@
     gameover = true;
     pause = true;
     aDie.play();
+    addHighscore(score);
     }
     }
     }
     // Pause/Unpause
     if (lastPress === KEY_ENTER) {
     pause = !pause;
+    lastPress = null;
+    }
+    };
+    // Highscore Scene
+    highscoresScene = new Scene();
+    highscoresScene.paint = function (ctx) {
+    var i = 0,
+    l = 0;
+    // Clean canvas
+    ctx.fillStyle = '#030';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    // Draw title
+    ctx.fillStyle = '#fff';
+    ctx.textAlign = 'center';
+    ctx.fillText('HIGH SCORES', 150, 30);
+    // Draw high scores
+    ctx.textAlign = 'right';
+    for (i = 0, l = highscores.length; i < l; i += 1) {
+    if (i === posHighscore) {
+    ctx.fillText('*' + highscores[i], 180, 40 + i * 10);
+    } else {
+    ctx.fillText(highscores[i], 180, 40 + i * 10);
+    }
+    }
+ 
+    };
+    highscoresScene.act = function () {
+    // Load next scene
+    if (lastPress === KEY_ENTER) {
+    loadScene(gameScene);
     lastPress = null;
     }
     };
