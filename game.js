@@ -158,9 +158,9 @@
         food = new Rectangle(80, 80, 10, 10);
 
         setTimeout(() => {
-        food2 = new Rectangle(80, 80, 10,10);
-            }, 10000);
-        
+            food2 = new Rectangle(80, 80, 10, 10);
+        }, 10000);
+
         // Create walls
         //wall.push(new Rectangle(50, 50, 10, 10));
         //wall.push(new Rectangle(50, 100, 10, 10));
@@ -241,9 +241,9 @@
         // Draw food2
 
         ctx.strokeStyle = '#fff';
-       food2.drawImage(ctx, iFood2);
-       
-        
+        food2.drawImage(ctx, iFood2);
+
+
         // Debug last key pressed
         //ctx.fillText('Last Press: '+lastPress,0,20);
 
@@ -313,8 +313,8 @@
 
             // Food Intersects
             if (body[0].intersects(food)) {
+                score += 1;
                 uploadScore()
-                 score += 1;
                 body.push(new Rectangle(0, 0, 10, 10));
                 food.x = random(canvas.width / 10 - 1) * 10;
                 food.y = random(canvas.height / 10 - 1) * 10;
@@ -322,10 +322,10 @@
             }
             // Food 2 Intersects
             if (body[0].intersects(food2)) {
-                uploadScore()
                 score += 1;
+                uploadScore()
                 body.push(new Rectangle(10, 10, 10, 10));
-                 food2.x = -9;
+                food2.x = -9;
                 food2.y = -9;
 
                 setTimeout(() => {
@@ -395,23 +395,20 @@
     };
     window.addEventListener('load', init, false);
 
-// FETCH SCORE API
+    // FETCH SCORE API
 
-function  uploadScore(score){
-    fetch(` www.jsonplaceholder.com?score=${score}`, {
-            method: 'POST'
-    })
-    .then(function(response){
-         return response.json()
-    })
-   
-    .then(function(data){
-console.log('Score sent successfully' + data);
-    })
-    .catch(console.log('Error trying to send the score'))
-}
-
-
+    function uploadScore() {
+        fetch("https://jsonplaceholder.typicode.com/todos/" + score)
+            .then(function (response) {
+                return response.json();
+            })
+            .then(function (json) {
+                return console.log('Score sent successfully')
+            })
+            .catch(function (error) {
+                return console.log('Error trying to send the score')
+            });
+    }
 
 }(window))
 
