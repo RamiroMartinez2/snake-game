@@ -172,7 +172,7 @@
             body[i].drawImage(ctx, iBody);
         }
         // Draw walls
-        
+
         //ctx.fillStyle = '#999';
         //ctx.strokeStyle = '#999';
         //for(i = 0 ,l = wall.length; i < l; i += 1) {
@@ -200,10 +200,16 @@
             ctx.textAlign = 'left';
         }
     }
-    function act() {
+   
+    function act(deltaTime) {
+        x += 120 * deltaTime;
+        if (x > canvas.width) {
+        x = 0;
+        }
         var i = 0,
             l = 0;
         if (!pause) {
+
             // GameOver Reset
             if (gameover) {
                 reset();
@@ -295,7 +301,10 @@
         paint(ctx);
     }
     function run() {
-        window.requestAnimationFrame(run);
+        setTimeout( function () {
+            window.requestAnimationFrame(run)
+            }, 50);
+            
         var now = Date.now(),
         deltaTime = (now - lastUpdate) / 1000;
         if (deltaTime > 1) {
